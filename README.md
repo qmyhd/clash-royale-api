@@ -12,12 +12,13 @@ A [Clash Royale](http://supercell.com/en/games/clashroyale/) API that provides i
 1. [How to use](#how-to-use)
     1. [Endpoints](#endpoints)
     2. [Images](#images)
-2. [Want to help](#want-to-help)
-3. [Development](#development)
+2. [Comprehensive Guides](#comprehensive-guides)
+3. [Want to help](#want-to-help)
+4. [Development](#development)
     1. [Install](#install)
     2. [Run](#run)
     3. [Test](#test)
-4. [Apps that use this API](#apps-that-use-this-api)
+5. [Apps that use this API](#apps-that-use-this-api)
 
 ## How to use
 
@@ -68,6 +69,30 @@ You can get the images too! Thank you [MaherFa](https://github.com/MaherFa)!
 [8]: http://www.clashapi.xyz/images/cards/arrows.png
 [9]: http://www.clashapi.xyz/images/chests/super-magical-chest.png
 [10]: http://www.clashapi.xyz/images/leagues/ultimate-champion.png
+
+## Comprehensive Guides
+
+For detailed information on extracting cards, images, and descriptions:
+
+📚 **[Complete Cards Extraction Guide](CARDS_EXTRACTION_GUIDE.md)** - Comprehensive guide covering:
+- API architecture and authentication
+- Card data structure and properties  
+- All extraction endpoints with examples
+- Code samples in JavaScript, Python, and cURL
+- Image extraction methods
+- Important features and capabilities
+
+🖼️ **[Card Images Reference](CARD_IMAGES_REFERENCE.md)** - Quick reference for all available cards:
+- Complete list of 80+ card images
+- Image naming conventions
+- Batch download scripts
+- Card categorization
+
+🧪 **[API Testing Guide](API_TESTING_GUIDE.md)** - Testing and verification guide:
+- Quick testing commands
+- Local setup instructions
+- Verification checklists
+- Common issues and solutions
 
 ## Want to help
 
