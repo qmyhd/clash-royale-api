@@ -52,6 +52,33 @@ const CardSchema = new Schema({
     require: true,
   },
 
+  // Royaledle enrichment fields
+  targets: {
+    type: String,
+  },
+
+  rangeType: {
+    type: String,
+  },
+
+  hitSpeed: {
+    type: Number,
+  },
+
+  speed: {
+    type: String,
+  },
+
+  releaseDate: {
+    type: String,
+  },
+
+  emojiHints: [String],
+
+  image: {
+    type: String,
+  },
+
 });
 
 CardSchema.pre('save', function preSave(next) {

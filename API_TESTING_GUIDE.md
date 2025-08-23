@@ -7,12 +7,12 @@ This guide helps you quickly test the API endpoints and verify card data extract
 ### 1. Test Image Access (No Auth Required)
 ```bash
 # Test if images are accessible
-curl -I "http://www.clashapi.xyz/images/cards/arrows.png"
-curl -I "http://www.clashapi.xyz/images/cards/knight.png"
-curl -I "http://www.clashapi.xyz/images/cards/magic-archer.png"
+curl -I "http://localhost:8085/images/cards/arrows.png"
+curl -I "http://localhost:8085/images/cards/knight.png"
+curl -I "http://localhost:8085/images/cards/magic-archer.png"
 
 # Download a test image
-curl "http://www.clashapi.xyz/images/cards/arrows.png" --output test_arrow.png
+curl "http://localhost:8085/images/cards/arrows.png" --output test_arrow.png
 ```
 
 ### 2. Test API Endpoints (Auth Required)
@@ -21,19 +21,19 @@ curl "http://www.clashapi.xyz/images/cards/arrows.png" --output test_arrow.png
 
 # Test getting all cards
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     "http://www.clashapi.xyz/api/cards"
+     "http://localhost:8085/api/cards"
 
 # Test getting a specific card by name
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     "http://www.clashapi.xyz/api/cards/arrows"
+     "http://localhost:8085/api/cards/arrows"
 
 # Test filtering by rarity
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     "http://www.clashapi.xyz/api/cards?rarity=Legendary"
+     "http://localhost:8085/api/cards?rarity=Legendary"
 
 # Test random deck generation
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     "http://www.clashapi.xyz/api/random-deck"
+     "http://localhost:8085/api/random-deck"
 ```
 
 ## 🧪 Local Testing Setup
@@ -66,10 +66,10 @@ npm start
 ### 4. Test Local Endpoints
 ```bash
 # Test image access (should work immediately)
-curl -I "http://localhost:3000/images/cards/arrows.png"
+curl -I "http://localhost:8085/images/cards/arrows.png"
 
 # Test API endpoints (may need setup/auth)
-curl "http://localhost:3000/api/cards"
+curl "http://localhost:8085/api/cards"
 ```
 
 ## 🔍 Verification Checklist
@@ -101,7 +101,7 @@ curl "http://localhost:3000/api/cards"
 **Solution**: Most endpoints require a valid Bearer token
 ```bash
 # You need to obtain a token first (check auth endpoints)
-curl -H "Authorization: Bearer YOUR_TOKEN" "http://www.clashapi.xyz/api/cards"
+curl -H "Authorization: Bearer YOUR_TOKEN" "http://localhost:8085/api/cards"
 ```
 
 ### Issue: "Connection Refused" 
@@ -115,8 +115,8 @@ npm run dev
 **Solution**: Verify the idName format
 ```bash
 # Correct format (lowercase, hyphens, no periods)
-curl "http://www.clashapi.xyz/images/cards/magic-archer.png"  # ✓
-curl "http://www.clashapi.xyz/images/cards/Magic-Archer.png"  # ✗
+curl "http://localhost:8085/images/cards/magic-archer.png"  # ✓
+curl "http://localhost:8085/images/cards/Magic-Archer.png"  # ✗
 ```
 
 ### Issue: "Empty Response"
@@ -197,7 +197,7 @@ Create a Postman collection with these requests:
 ```javascript
 const axios = require('axios');
 
-const BASE_URL = 'http://www.clashapi.xyz';
+const BASE_URL = 'http://localhost:8085';
 const TOKEN = 'your-auth-token';
 
 async function testAPI() {
@@ -233,7 +233,7 @@ testAPI();
 # Test concurrent requests
 for i in {1..10}; do
   curl -H "Authorization: Bearer YOUR_TOKEN" \
-       "http://www.clashapi.xyz/api/cards" &
+       "http://localhost:8085/api/cards" &
 done
 wait
 ```
@@ -241,8 +241,8 @@ wait
 ### Image Download Speed Test
 ```bash
 # Time image downloads
-time curl "http://www.clashapi.xyz/images/cards/arrows.png" -o /dev/null
-time curl "http://www.clashapi.xyz/images/cards/knight.png" -o /dev/null
+time curl "http://localhost:8085/images/cards/arrows.png" -o /dev/null
+time curl "http://localhost:8085/images/cards/knight.png" -o /dev/null
 ```
 
 ## 🔐 Authentication Testing
@@ -250,18 +250,18 @@ time curl "http://www.clashapi.xyz/images/cards/knight.png" -o /dev/null
 ### Check if Auth is Required
 ```bash
 # Should return 401 Unauthorized
-curl "http://www.clashapi.xyz/api/cards"
+curl "http://localhost:8085/api/cards"
 
 # Should return 200 OK (if you have valid token)
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     "http://www.clashapi.xyz/api/cards"
+     "http://localhost:8085/api/cards"
 ```
 
 ### Test Invalid Token
 ```bash
 # Should return 401 Unauthorized
 curl -H "Authorization: Bearer invalid-token" \
-     "http://www.clashapi.xyz/api/cards"
+     "http://localhost:8085/api/cards"
 ```
 
 ---

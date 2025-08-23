@@ -5,8 +5,7 @@ This comprehensive guide explains how to extract all cards, their images, and de
 ## 🏗️ API Architecture Overview
 
 ### Base URL
-- **Production**: `http://www.clashapi.xyz`
-- **Local Development**: `http://localhost:3000` (default)
+- Run locally: `http://localhost:8085`
 
 ### Authentication
 Most endpoints require authentication. Include the Authorization header:
@@ -99,9 +98,9 @@ Returns 8 random cards forming a deck.
 ```
 
 ### Examples
-- `http://www.clashapi.xyz/images/cards/arrows.png`
-- `http://www.clashapi.xyz/images/cards/magic-archer.png`
-- `http://www.clashapi.xyz/images/cards/baby-dragon.png`
+- `http://localhost:8085/images/cards/arrows.png`
+- `http://localhost:8085/images/cards/magic-archer.png`
+- `http://localhost:8085/images/cards/baby-dragon.png`
 
 ### Image File Naming Convention
 The `idName` is generated from the card name using these rules:
@@ -120,7 +119,7 @@ The `idName` is generated from the card name using these rules:
 ```javascript
 const axios = require('axios');
 
-const API_BASE = 'http://www.clashapi.xyz';
+const API_BASE = 'http://localhost:8085';
 const TOKEN = 'your-auth-token';
 
 // Get all cards with descriptions
@@ -167,7 +166,7 @@ getAllCards().then(cards => {
 import requests
 import json
 
-API_BASE = 'http://www.clashapi.xyz'
+API_BASE = 'http://localhost:8085'
 TOKEN = 'your-auth-token'
 
 def get_all_cards():
@@ -212,19 +211,19 @@ if cards:
 ```bash
 # Get all cards
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     "http://www.clashapi.xyz/api/cards"
+     "http://localhost:8085/api/cards"
 
 # Get specific card
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     "http://www.clashapi.xyz/api/cards/arrows"
+     "http://localhost:8085/api/cards/arrows"
 
 # Download card image
-curl "http://www.clashapi.xyz/images/cards/arrows.png" \
+curl "http://localhost:8085/images/cards/arrows.png" \
      --output arrows.png
 
 # Filter by rarity
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     "http://www.clashapi.xyz/api/cards?rarity=Legendary"
+     "http://localhost:8085/api/cards?rarity=Legendary"
 ```
 
 ## 🎯 Important Features & Capabilities
