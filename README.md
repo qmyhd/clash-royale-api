@@ -1,11 +1,8 @@
-# [Clash Royale API](http://www.clashapi.xyz/)
+# Clash Royale API
 
-[![Codeship Status for martincarrera/clash-royale-api](https://codeship.com/projects/4f412dd0-0006-0134-4d8c-1e95689fe79f/status?branch=master)](https://codeship.com/projects/153028) [![Coverage Status](https://coveralls.io/repos/github/martincarrera/clash-royale-api/badge.svg?branch=master)](https://coveralls.io/github/martincarrera/clash-royale-api?branch=master)
-[![donate paypal](https://img.shields.io/badge/donate-paypal-blue.svg)](https://www.paypal.me/MartinCarrera)
+A self-hosted [Clash Royale](http://supercell.com/en/games/clashroyale/) API that exposes game data and images.
 
-A [Clash Royale](http://supercell.com/en/games/clashroyale/) API that provides information about the game.
-
-> If you develop an app using this API, please submit a pull request adding it to the [apps table](#apps-that-use-this-api).
+> The original public endpoint (clashapi.xyz) is no longer available. Run this project locally to access data or export it for offline use.
 
 ## Content
 
@@ -26,7 +23,7 @@ Consume the API to get all the information you need from these routes.
 
 ### Endpoints
 
-[Base route](http://www.clashapi.xyz).
+[Base route](http://localhost:8085).
 
 | Route | HTTP Verb | Description |
 |---|---|---|
@@ -47,12 +44,12 @@ Consume the API to get all the information you need from these routes.
 | `/api/players/:idName` | `GET` | Player level information |
 | [`/api/random-deck`][6] | `GET` | Get a Random deck! |
 
-[1]: http://www.clashapi.xyz/api/arenas
-[2]: http://www.clashapi.xyz/api/cards
-[3]: http://www.clashapi.xyz/api/chests
-[4]: http://www.clashapi.xyz/api/leagues
-[5]: http://www.clashapi.xyz/api/players
-[6]: http://www.clashapi.xyz/api/random-deck
+[1]: http://localhost:8085/api/arenas
+[2]: http://localhost:8085/api/cards
+[3]: http://localhost:8085/api/chests
+[4]: http://localhost:8085/api/leagues
+[5]: http://localhost:8085/api/players
+[6]: http://localhost:8085/api/random-deck
 
 ### Images
 
@@ -65,10 +62,10 @@ You can get the images too! Thank you [MaherFa](https://github.com/MaherFa)!
 | [`/images/chests/${idName}.png`][9] | Chests images |
 | [`/images/leagues/${idName}.png`][10] | Leagues images |
 
-[7]: http://www.clashapi.xyz/images/arenas/royal-arena.png
-[8]: http://www.clashapi.xyz/images/cards/arrows.png
-[9]: http://www.clashapi.xyz/images/chests/super-magical-chest.png
-[10]: http://www.clashapi.xyz/images/leagues/ultimate-champion.png
+[7]: http://localhost:8085/images/arenas/royal-arena.png
+[8]: http://localhost:8085/images/cards/arrows.png
+[9]: http://localhost:8085/images/chests/super-magical-chest.png
+[10]: http://localhost:8085/images/leagues/ultimate-champion.png
 
 ## Comprehensive Guides
 
@@ -93,6 +90,45 @@ For detailed information on extracting cards, images, and descriptions:
 - Local setup instructions
 - Verification checklists
 - Common issues and solutions
+
+🎮 **[Royaledle Build Guide](ROYALEDELE_GUIDE.md)** - Roadmap for recreating the daily wordle-style card game:
+- Dataset export and enrichment
+- Implementation tips for Classic, Pixel, Emoji and Description modes
+- Daily puzzle logic and sharing results
+
+For building offline tools like a Royaledle clone, you can export the card data to a local JSON file:
+
+```bash
+npm run export:cards
+```
+
+The command writes `data/cards-base.json` with all fields defined in [`card-schema.js`](src/schemas/card-schema.js).  You can enrich this dataset with additional properties—such as `targets`, `rangeType`, `hitSpeed`, `speed`, or `releaseDate`—and serve it alongside the images in `public/images/cards`.
+
+To jump‑start that enrichment, there's also a helper script that pre-populates those extra fields with `null` values for manual editing:
+
+```bash
+npm run export:royaledle
+```
+
+This creates `data/cards-royaledle.json`, which mirrors the schema above and adds `targets`, `rangeType`, `hitSpeed`, `speed`, `releaseDate`, and an `emojiHints` array for use in Royaledle-style games.
+
+After you populate those extra fields, you can load the enriched dataset back into MongoDB:
+
+```bash
+npm run load:royaledle
+```
+
+The command reads `data/cards-royaledle.json` and upserts each record into the `cards` collection, enabling local experimentation with the additional Royaledle attributes.
+
+To pick a deterministic "card of the day" for a Royaledle-style daily puzzle, run:
+
+```bash
+npm run daily:card
+```
+
+The helper uses the current day of the year to select a card from `cards-royaledle.json` (falling back to `cards-base.json` if needed) and prints the card's slug and image path. Use this to keep all four puzzle modes in sync each day.
+
+For a full walkthrough of building the game around this dataset, see the [Royaledle Build Guide](ROYALEDELE_GUIDE.md).
 
 ## Want to help
 
@@ -138,6 +174,8 @@ If you don't have `Nodemon` installed
 ```
 
 ### Test
+
+No automated test suite is bundled yet. Running the command below simply prints a placeholder message.
 
 ```bash
 > npm test
