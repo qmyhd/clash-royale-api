@@ -18,6 +18,7 @@ A self-hosted [Clash Royale](http://supercell.com/en/games/clashroyale/) API tha
 5. [Apps that use this API](#apps-that-use-this-api)
 6. [Recreational projects](#recreational-projects)
 7. [Project status & tips](#project-status--tips)
+7. [Project status & tips](#project-status--tips)
 
 ## How to use
 
