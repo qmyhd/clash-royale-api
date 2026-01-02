@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').load();
 
 const config = {
   PORT: process.env.PORT || 8085,
