@@ -16,6 +16,7 @@ A self-hosted [Clash Royale](http://supercell.com/en/games/clashroyale/) API tha
     2. [Run](#run)
     3. [Test](#test)
 5. [Apps that use this API](#apps-that-use-this-api)
+6. [Recreational projects](#recreational-projects)
 
 ## How to use
 
@@ -196,6 +197,15 @@ No automated test suite is bundled yet. Running the command below simply prints 
 | ClashElite | Simple app that gives info on chest cycles and generates random decks with copy and share feature. | [Go!](https://play.google.com/store/apps/details?id=com.wordpress.redmanandroid.clashelite) |
 
 Made with :heart: by clash fans.
+
+----------
+## Recreational projects
+
+This repository now also hosts small, single‑page recreational demos alongside the Clash Royale API. You can open them directly from the `public/recreation` directory—no build step required.
+
+Current experiences:
+
+- **Ocean Wave Simulation** — calming animated sea with adjustable wind, wave height, and lighting. Open [`public/recreation/ocean-wave.html`](public/recreation/ocean-wave.html) in a browser to try it.
 
 ----------
 This content is not affiliated with, endorsed, sponsored, or specifically approved by Supercell and Supercell is not responsible for it. For more information see [Supercell’s Fan Content Policy](http://www.supercell.com/fan-content-policy).
