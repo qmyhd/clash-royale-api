@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ocean Wave Simulation</title>
+  <style>
+    :root {
+      --accent: #7ad1e9;
+      --deep: #0d1b2a;
+      --foam: #dff6ff;
+      --sand: #f5efe6;
+      --controls: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 20%, #2b4c6f, #0b1324 55%, #050a16 100%);
+      color: #e9f1f7;
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      gap: 1rem;
+    }
+
+    .frame {
+      width: min(1200px, 95vw);
+      background: rgba(10, 20, 36, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 18px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+
+    header {
+      padding: 1.25rem 1.5rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 2vw, 1.8rem);
+      letter-spacing: 0.02em;
+    }
+
+    p.lead {
+      margin: 0;
+      opacity: 0.8;
+      font-size: 0.95rem;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      padding: 1rem 1.5rem 1.25rem;
+      background: linear-gradient(135deg, rgba(122, 209, 233, 0.08), rgba(13, 27, 42, 0.6));
+    }
+
+    .control {
+      background: var(--controls);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 0.9rem 1rem;
+      border-radius: 12px;
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    #canvas-wrapper {
+      position: relative;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent);
+    }
+
+    canvas {
+      width: 100%;
+      height: 60vh;
+      display: block;
+      background: radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.1), transparent 45%),
+        linear-gradient(#0b1a2f, #0a2039 50%, #051224 100%);
+    }
+
+    .tooltip {
+      position: absolute;
+      right: 1rem;
+      bottom: 1rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.35);
+      font-size: 0.85rem;
+      opacity: 0.75;
+    }
+
+    @media (max-width: 700px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      canvas {
+        height: 55vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <header>
+      <div>
+        <h1>Ocean Wave Simulation</h1>
+        <p class="lead">A calming, single-page exploration of wind, swell, and light on an open sea.</p>
+      </div>
+    </header>
+
+    <div id="canvas-wrapper">
+      <canvas id="ocean-canvas" aria-label="Ocean wave animation" role="img"></canvas>
+      <div class="tooltip">Use the sliders to gently nudge the sea.</div>
+    </div>
+
+    <section class="controls" aria-label="Simulation controls">
+      <div class="control">
+        <label for="wind">Wind speed <span id="wind-value">1.2x</span></label>
+        <input type="range" id="wind" min="0.4" max="2.4" step="0.1" value="1.2" />
+      </div>
+      <div class="control">
+        <label for="height">Wave height <span id="height-value">1.0m</span></label>
+        <input type="range" id="height" min="0.4" max="2" step="0.1" value="1" />
+      </div>
+      <div class="control">
+        <label for="light">Lighting mood <span id="light-value">Dawn</span></label>
+        <input type="range" id="light" min="0" max="1" step="0.02" value="0.35" />
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('ocean-canvas');
+    const ctx = canvas.getContext('2d');
+
+    const windInput = document.getElementById('wind');
+    const waveInput = document.getElementById('height');
+    const lightInput = document.getElementById('light');
+
+    const windValue = document.getElementById('wind-value');
+    const heightValue = document.getElementById('height-value');
+    const lightValue = document.getElementById('light-value');
+
+    const layers = [
+      { amplitude: 12, wavelength: 120, speed: 0.65, color: 'rgba(102, 197, 235, 0.68)', crest: 'rgba(255, 255, 255, 0.28)' },
+      { amplitude: 20, wavelength: 210, speed: 0.4, color: 'rgba(54, 134, 190, 0.72)', crest: 'rgba(255, 255, 255, 0.18)' },
+      { amplitude: 32, wavelength: 340, speed: 0.26, color: 'rgba(24, 80, 130, 0.85)', crest: 'rgba(255, 255, 255, 0.1)' },
+      { amplitude: 48, wavelength: 520, speed: 0.16, color: 'rgba(10, 40, 80, 0.9)', crest: 'rgba(255, 255, 255, 0.06)' }
+    ];
+
+    let time = 0;
+    let wind = parseFloat(windInput.value);
+    let waveHeight = parseFloat(waveInput.value);
+    let lighting = parseFloat(lightInput.value);
+    let foamParticles = [];
+    let starField = [];
+
+    const updateLabels = () => {
+      windValue.textContent = `${wind.toFixed(1)}x`;
+      heightValue.textContent = `${waveHeight.toFixed(1)}m`;
+      const moods = ['Night', 'Dawn', 'Soft Daylight', 'Bright'];
+      const moodIndex = Math.min(moods.length - 1, Math.floor(lighting * moods.length));
+      lightValue.textContent = moods[moodIndex];
+    };
+
+    function resize() {
+      const { width } = canvas.getBoundingClientRect();
+      canvas.width = width;
+      canvas.height = Math.max(420, window.innerHeight * 0.58);
+      seedFoam();
+      seedStars();
+    }
+
+    function drawBackground() {
+      const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      const dawn = lerpColor('#081429', '#1f5a8a', lighting);
+      const midday = lerpColor('#0c1d35', '#4fa4e5', lighting);
+      sky.addColorStop(0, lighten(dawn, 10 + lighting * 25));
+      sky.addColorStop(0.45, lerpColor(dawn, midday, 0.4));
+      sky.addColorStop(1, '#050d1a');
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      drawStars();
+      drawHorizonGlow();
+    }
+
+    function drawHorizonGlow() {
+      const glow = ctx.createLinearGradient(0, canvas.height * 0.25, 0, canvas.height * 0.75);
+      glow.addColorStop(0, `rgba(255, 255, 255, ${0.18 + lighting * 0.25})`);
+      glow.addColorStop(0.4, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const mist = ctx.createLinearGradient(0, canvas.height * 0.55, 0, canvas.height * 0.75);
+      mist.addColorStop(0, `rgba(255, 255, 255, ${0.04 + lighting * 0.08})`);
+      mist.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = mist;
+      ctx.fillRect(0, canvas.height * 0.5, canvas.width, canvas.height * 0.3);
+    }
+
+    function drawStars() {
+      const twilight = Math.max(0, 1.2 - lighting * 2);
+      if (twilight <= 0.02) return;
+      starField.forEach((star, i) => {
+        const twinkle = 0.5 + Math.sin(time * (0.5 + star.twinkle) + i) * 0.3;
+        const alpha = twilight * star.brightness * twinkle;
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function drawCelestialBody() {
+      const isNight = lighting < 0.45;
+      const centerX = canvas.width * 0.78;
+      const centerY = canvas.height * 0.22;
+      const radius = isNight ? 26 : 34;
+
+      const core = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius * 2.8);
+      const color = isNight ? '255,255,255' : '255,209,128';
+      const haloAlpha = isNight ? 0.65 : 0.55;
+      core.addColorStop(0, `rgba(${color}, ${isNight ? 0.95 : 0.9})`);
+      core.addColorStop(0.45, `rgba(${color}, ${isNight ? 0.45 : 0.4})`);
+      core.addColorStop(1, `rgba(${color}, ${haloAlpha})`);
+      ctx.fillStyle = core;
+      ctx.fillRect(centerX - radius * 3, centerY - radius * 3, radius * 6, radius * 6);
+
+      const disk = ctx.createRadialGradient(centerX, centerY, radius * 0.2, centerX, centerY, radius);
+      disk.addColorStop(0, `rgba(${color}, ${isNight ? 1 : 0.95})`);
+      disk.addColorStop(1, `rgba(${color}, ${isNight ? 0.55 : 0.75})`);
+      ctx.fillStyle = disk;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawWaves() {
+      const baseHeight = canvas.height * 0.62 + Math.sin(time * 0.15) * 2.2;
+      layers.forEach((layer, index) => {
+        const phase = time * layer.speed * wind;
+        const amplitude = layer.amplitude * waveHeight * (1 + index * 0.18);
+        const crestOpacity = Math.min(0.7, 0.22 + waveHeight * 0.22);
+
+        ctx.beginPath();
+        for (let x = 0; x <= canvas.width; x += 1) {
+          const noise = Math.sin((x / layer.wavelength) * 2 * Math.PI + phase) * amplitude;
+          const ripple = Math.sin((x / 24) + phase * 3.1) * 2.6 * wind;
+          const micro = Math.sin((x / 7) + phase * 5.4) * (1.1 + wind * 0.4);
+          const y = baseHeight + noise + ripple + micro + index * 16;
+          if (x === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+
+        ctx.lineTo(canvas.width, canvas.height);
+        ctx.lineTo(0, canvas.height);
+        ctx.closePath();
+
+        const gradient = ctx.createLinearGradient(0, baseHeight - 40, 0, canvas.height);
+        gradient.addColorStop(0, lighten(layer.color, 12 + lighting * 28));
+        gradient.addColorStop(1, darken(layer.color, 18 - lighting * 12));
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        ctx.lineWidth = 1.5;
+        const [r, g, b, a] = parseRgba(layer.crest);
+        const crestAlpha = Math.min(1, crestOpacity * a + 0.08 * wind);
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${crestAlpha.toFixed(2)})`;
+        ctx.beginPath();
+        for (let x = 0; x <= canvas.width; x += 4) {
+          const y = baseHeight + Math.sin((x / layer.wavelength) * 2 * Math.PI + phase) * amplitude + index * 16;
+          ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+      });
+      drawFoam(baseHeight);
+      drawLightPath(baseHeight);
+    }
+
+    function seedFoam() {
+      const count = Math.max(120, Math.round(canvas.width / 8));
+      foamParticles = Array.from({ length: count }, () => createFoamParticle());
+    }
+
+    function seedStars() {
+      const count = Math.max(60, Math.round(canvas.width / 18));
+      starField = Array.from({ length: count }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height * 0.45,
+        size: Math.random() * 1.3 + 0.4,
+        brightness: 0.4 + Math.random() * 0.6,
+        twinkle: Math.random() * 1.4
+      }));
+    }
+
+    function createFoamParticle() {
+      return {
+        x: Math.random() * canvas.width,
+        y: canvas.height * (0.6 + Math.random() * 0.25),
+        drift: (Math.random() - 0.5) * 0.5,
+        size: 1 + Math.random() * 1.6,
+        life: 0.3 + Math.random() * 0.7
+      };
+    }
+
+    function drawFoam(baseHeight) {
+      const foamRise = Math.max(0.05, wind * 0.08 + waveHeight * 0.03);
+      foamParticles.forEach((particle, i) => {
+        particle.x += (0.5 + wind * 0.8) + particle.drift;
+        particle.y -= foamRise * (0.8 + Math.sin(time + i) * 0.2);
+        particle.life -= 0.0015 + wind * 0.0006;
+
+        if (particle.x > canvas.width || particle.y < baseHeight - 60 || particle.life <= 0) {
+          foamParticles[i] = createFoamParticle();
+          return;
+        }
+
+        const alpha = Math.max(0, Math.min(0.35, particle.life * 0.35));
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.beginPath();
+        ctx.ellipse(particle.x, particle.y, particle.size * 1.6, particle.size, 0, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function drawLightPath(baseHeight) {
+      const pathWidth = Math.max(120, canvas.width * 0.08 + wind * 14);
+      const centerX = canvas.width * 0.78;
+      const gradient = ctx.createRadialGradient(centerX, baseHeight - 60, 0, centerX, baseHeight + 120, pathWidth);
+      const shimmer = 0.12 + lighting * 0.14;
+      gradient.addColorStop(0, `rgba(255, 255, 255, ${shimmer})`);
+      gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.04)');
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(centerX - pathWidth, baseHeight - 120, pathWidth * 2, canvas.height - baseHeight + 140);
+    }
+
+    function animate() {
+      time += 0.008 + wind * 0.003;
+      drawBackground();
+      drawCelestialBody();
+      drawWaves();
+      drawSurfaceSparkle();
+      requestAnimationFrame(animate);
+    }
+
+    function drawSurfaceSparkle() {
+      const sparkle = ctx.createLinearGradient(0, canvas.height * 0.55, 0, canvas.height);
+      sparkle.addColorStop(0, `rgba(255, 255, 255, ${0.06 + lighting * 0.08})`);
+      sparkle.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = sparkle;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function lerpColor(a, b, t) {
+      const c1 = hexToRgb(a);
+      const c2 = hexToRgb(b);
+      const mix = (c1[0] + (c2[0] - c1[0]) * t);
+      return `rgb(${mix.toFixed(0)}, ${(c1[1] + (c2[1] - c1[1]) * t).toFixed(0)}, ${(c1[2] + (c2[2] - c1[2]) * t).toFixed(0)})`;
+    }
+
+    function hexToRgb(hex) {
+      const sanitized = hex.replace('#', '');
+      return [
+        parseInt(sanitized.substring(0, 2), 16),
+        parseInt(sanitized.substring(2, 4), 16),
+        parseInt(sanitized.substring(4, 6), 16)
+      ];
+    }
+
+    function lighten(color, amount) {
+      const [r, g, b, a] = parseRgba(color);
+      const factor = 1 + amount / 100;
+      return `rgba(${Math.min(255, r * factor)}, ${Math.min(255, g * factor)}, ${Math.min(255, b * factor)}, ${a})`;
+    }
+
+    function darken(color, amount) {
+      const [r, g, b, a] = parseRgba(color);
+      const factor = 1 - amount / 100;
+      return `rgba(${Math.max(0, r * factor)}, ${Math.max(0, g * factor)}, ${Math.max(0, b * factor)}, ${a})`;
+    }
+
+    function parseRgba(color) {
+      if (color.startsWith('#')) {
+        const [r, g, b] = hexToRgb(color);
+        return [r, g, b, 1];
+      }
+      const match = color.match(/rgba?\(([^)]+)\)/);
+      if (!match) return [0, 0, 0, 1];
+      const parts = match[1].split(',').map((n) => parseFloat(n));
+      if (parts.length === 3) parts.push(1);
+      return parts;
+    }
+
+    function handleInput() {
+      wind = parseFloat(windInput.value);
+      waveHeight = parseFloat(waveInput.value);
+      lighting = parseFloat(lightInput.value);
+      updateLabels();
+    }
+
+    windInput.addEventListener('input', handleInput);
+    waveInput.addEventListener('input', handleInput);
+    lightInput.addEventListener('input', handleInput);
+
+    window.addEventListener('resize', resize);
+
+    resize();
+    updateLabels();
+    animate();
+  </script>
+</body>
+</html>
