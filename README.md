@@ -217,7 +217,7 @@ Current experiences:
 ## Project status & tips
 
 - The API is self‑hosted and requires MongoDB running locally (see **Run** above).
-- Environment variables are loaded via `.env` (see `src/config/config.js`); copy `.env.example` if you create one.
+- Environment variables are loaded via `.env` (see `src/config/config.js`); create and populate a `.env` file with the required keys.
 - If you only want the recreational demos, no database or server is needed—open the HTML files directly.
 - API routes expect Clash Royale data in MongoDB; use the existing export/import scripts in `scripts/` to seed your database before hitting `/api/*`.
 - Automated tests are not provided—run `npm run lint` for quick checks while developing.
