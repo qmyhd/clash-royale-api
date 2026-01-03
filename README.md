@@ -16,6 +16,8 @@ A self-hosted [Clash Royale](http://supercell.com/en/games/clashroyale/) API tha
     2. [Run](#run)
     3. [Test](#test)
 5. [Apps that use this API](#apps-that-use-this-api)
+6. [Recreational projects](#recreational-projects)
+7. [Project status & tips](#project-status--tips)
 
 ## How to use
 
@@ -73,7 +75,7 @@ For detailed information on extracting cards, images, and descriptions:
 
 📚 **[Complete Cards Extraction Guide](CARDS_EXTRACTION_GUIDE.md)** - Comprehensive guide covering:
 - API architecture and authentication
-- Card data structure and properties  
+- Card data structure and properties
 - All extraction endpoints with examples
 - Code samples in JavaScript, Python, and cURL
 - Image extraction methods
@@ -102,9 +104,9 @@ For building offline tools like a Royaledle clone, you can export the card data 
 npm run export:cards
 ```
 
-The command writes `data/cards-base.json` with all fields defined in [`card-schema.js`](src/schemas/card-schema.js).  You can enrich this dataset with additional properties—such as `targets`, `rangeType`, `hitSpeed`, `speed`, or `releaseDate`—and serve it alongside the images in `public/images/cards`.
+The command writes `data/cards-base.json` with all fields defined in [`card-schema.js`](src/schemas/card-schema.js). You can enrich this dataset with additional properties—such as `targets`, `rangeType`, `hitSpeed`, `speed`, or `releaseDate`—and serve it alongside the images in `public/images/cards`.
 
-To jump‑start that enrichment, there's also a helper script that pre-populates those extra fields with `null` values for manual editing:
+To jump-start that enrichment, there's also a helper script that pre-populates those extra fields with `null` values for manual editing:
 
 ```bash
 npm run export:royaledle
@@ -196,6 +198,29 @@ No automated test suite is bundled yet. Running the command below simply prints 
 | ClashElite | Simple app that gives info on chest cycles and generates random decks with copy and share feature. | [Go!](https://play.google.com/store/apps/details?id=com.wordpress.redmanandroid.clashelite) |
 
 Made with :heart: by clash fans.
+
+----------
+
+## Recreational projects
+
+This repository now also hosts small, single-page recreational demos alongside the Clash Royale API.
+
+How to view:
+
+1. Open the repo locally.
+2. Double-click any HTML file under `public/recreation` (no build or server needed).
+
+Current experiences:
+
+- **Ocean Wave Simulation** — calming animated sea with adjustable wind, wave height, and lighting. Open [`public/recreation/ocean-wave.html`](public/recreation/ocean-wave.html) in a browser to try it.
+
+## Project status & tips
+
+- The API is self-hosted and requires MongoDB running locally (see **Run** above).
+- Environment variables are loaded via `.env` (see `src/config/config.js`); copy `.env.example` if you create one.
+- If you only want the recreational demos, no database or server is needed—open the HTML files directly.
+- API routes expect Clash Royale data in MongoDB; use the existing export/import scripts in `scripts/` to seed your database before hitting `/api/*`.
+- Automated tests are not provided—run `npm run lint` for quick checks while developing.
 
 ----------
 This content is not affiliated with, endorsed, sponsored, or specifically approved by Supercell and Supercell is not responsible for it. For more information see [Supercell’s Fan Content Policy](http://www.supercell.com/fan-content-policy).
